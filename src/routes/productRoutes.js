@@ -6,9 +6,11 @@ router.get('/products', productController.getProducts);
 
 router.get('/products/:productId', productController.getProductById);
 
-router.post('/dashboard', productController.createProduct);
+router.get('/dashboard', productController.getProducts);
 
-router.get('/dashboard/new', productController.showNewProduct)
+router.get('/dashboard/new', productController.showNewProduct);
+
+router.post('/dashboard', productController.createProduct);
 
 router.put('/dashboard/:productId', productController.updateProduct);
 
