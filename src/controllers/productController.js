@@ -1,9 +1,11 @@
 const products = require('../models/Product.js')
+const formulario = require('../templates/formulario.js')
+
 
 const getProducts = async (req, res) => {
     try {
         const articulos = await products.find();
-        res.json(articulos);
+        res.send(articulos);
     } catch(error) {
         res.status(500).json({error: error.message})
     }
@@ -11,66 +13,37 @@ const getProducts = async (req, res) => {
 
 const getProductById = async (req, res) => {
     try{
-        const articulo = await products.findById(req.params.id);
-        res.json(articulo)
+        const id = req.params._id
+        const articulo = await products.findById(id);
+        res.send(articulo)
     } catch(error) {
-        res.status(404).json({error:'El articulo no ha sido encontrado'})
+        res.status(500).send({message:'El articulo con número' + req.params._id + 'no ha sido encontrado'})
     }
 };
 
 const showNewProduct = async(req, res) => {
-    const formTemp = `
-    <!DOCTYPE html>
-    <html lang="es">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Add an article</title>
-    </head>
-    <body>
-            <h1>Añade un artículo nuevo</h1>
-            <form action='/dashboard' method='post'>
-                <label for="nombre">Nombre:</label>
-                <input type="text" id="nombre" name="nombre" required>
-
-                <label for="descripcion">Descripción:</label>
-                <textarea id="descripcion" name="descripcion" required></textarea>
-
-                <label for="imagen">Imagen (URL):</label>
-                <input type="text" id="imagen" name="imagen">
-
-                <label for="categoria">Categoría:</label>
-                <input type="text" id="categoria" name="categoria">
-
-                <label for="talla">Talla:</label>
-                <input type="text" id="talla" name="talla" required>
-
-                <label for="precio">Precio:</label>
-                <input type="number" id="precio" name="precio" required>
-
-                <button type="submit">Guardar</button>
-            </form>
-    </body>
-    </html>
-    `;
-    res.send(formTemp)
+    try {
+        const formTemp = formulario;
+        res.send(formTemp)
+    } catch (error) {
+        res.status(400).json({error:'Error al cargar el formulario'})
+    }
 };
 
 const createProduct = async (req, res) => {
-    //const articuloNuevo = new products(req.body);
     try {
         const articuloAlmacenado = await products.create(req.body);
         res.status(201).json(articuloAlmacenado)
     } catch(error) {
         res.status(400).json({error:'No se ha podido resolver su solicitud'})
-
     }
 };
 
 
 const updateProduct = async (req, res) => {
     try {
-        const articuloActualizado = await products.findByIdAndUpdate(req.params.id, req.body, {new:true});
+        const id = req.params._id;
+        const articuloActualizado = await products.findByIdAndUpdate(id, req.body, {new:true});
             res.json(articuloActualizado)
     } catch(error) {
         res.status(404).json({error:'El articulo no ha sido encontrado'})
@@ -79,7 +52,8 @@ const updateProduct = async (req, res) => {
 
 const deleteProduct = async (req, res) => {
     try{
-        await products.findByIdAndDelete(req.params.id);
+        const id = req.params._id;
+        const deletedProduct= await products.findByIdAndDelete(id);
         res.json({mensaje: 'El producto ha sido eliminado del inventario'})
     } catch(error) {
         res.status(404).json({error:'El articulo no ha sido encontrado'})
