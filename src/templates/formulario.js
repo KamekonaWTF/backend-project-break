@@ -1,3 +1,5 @@
+const products = require('../models/Product.js')
+
 const formulario = `   
 <!DOCTYPE html>
         <html lang="es">
@@ -39,6 +41,51 @@ const formulario = `
         </html>
 `
 
+function getProductCards(products) {
+    let html = '';
+    for (let product of products) {
+      html += `
+        <div class="product-card">
+          <img src="${product.imagen}" alt="${product.nombre}">
+          <h2>${product.nombre}</h2>
+          <p>${product.descripcion}</p>
+          <p>${product.precio}€</p>
+          <a href="/products/${product._id}">Ver detalle</a>
+        </div>
+      `;
+    }
+    return html;
+  }
 
-
-module.exports = {formulario}
+/*const productPage = `
+    <!DOCTYPE html>
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Tienda de ropa</title>
+            <link rel="stylesheet" href="/styles.css">
+        </head>
+        <body>
+        <div class="topnav">
+            <a href="">Dashboard</a>
+            <a href="edit">Contact</a>
+            <a href="#about">About</a>
+        </div>
+        <div class="product-info">
+          <img src="${articulo.imagen}" alt="${articulo.nombre}">
+          <h2>${articulo.nombre}</h2>
+          <p>${product.descripcion}</p>
+          <p>${product.precio}€</p>
+        </div>      
+        
+        </form>
+        </body>
+        </html>
+`
+*/
+module.exports = {
+    formulario, 
+    getProductCards,
+    //productPage
+}
