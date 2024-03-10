@@ -37,14 +37,15 @@ const getProductById = async (req, res) => {
                 <p>${articulo.descripcion}</p>
                 <p>${articulo.precio}€</p>
                 </div>      
-                
+                <a href='http://localhost:3000/dashboard/${id}'>Editar producto</a>
+                <button>BORRAR</button>
                 </form>
                 </body>
                 </html>
         `
         res.send(productPage)
     } catch(error) {
-        res.status(500).send({message:'El articulo con número ' + req.params._id + ' no ha sido encontrado'})
+        res.status(500).send({message:'El articulo con número ' + req.params.productId + ' no ha sido encontrado'})
     }
 };
 
@@ -60,7 +61,7 @@ const showNewProduct = async(req, res) => {
 const createProduct = async (req, res) => {
     try {
         const articuloAlmacenado = await products.create(req.body);
-        res.status(201).json(articuloAlmacenado)
+        res.status(201).redirect('/dashboard')
     } catch(error) {
         res.status(400).json({error:'No se ha podido resolver su solicitud'})
     }
@@ -69,9 +70,34 @@ const createProduct = async (req, res) => {
 
 const updateProduct = async (req, res) => {
     try {
-        const id = req.params._id;
+        const id = req.params.productId;
         const articuloActualizado = await products.findByIdAndUpdate(id, req.body, {new:true});
-            res.json(articuloActualizado)
+        const updateForm = `
+            <h1>Actualizar artículo</h1>
+                    <form action="/guardar-actualizacion/${id}" method="post">
+                        <label for="nombre">Nombre:</label>
+                        <input type="text" id="nombre" name="nombre" value="${articuloActualizado.nombre}" required>
+            
+                        <label for="descripcion">Descripción:</label>
+                        <textarea id="descripcion" name="descripcion" required>${articuloActualizado.descripcion}</textarea>
+            
+                        <label for="imagen">Imagen (URL):</label>
+                        <input type="text" id="imagen" name="imagen" value="${articuloActualizado.imagen}">
+            
+                        <label for="categoria">Categoría:</label>
+                        <input type="text" id="categoria" name="categoria" value="${articuloActualizado.categoria}">
+            
+                        <label for="talla">Talla:</label>
+                        <input type="text" id="talla" name="talla" value="${articuloActualizado.talla}" required>
+            
+                        <label for="precio">Precio:</label>
+                        <input type="number" id="precio" name="precio" value="${articuloActualizado.precio}" required>
+            
+                        <button type="submit">Guardar</button>
+                    </form>
+                `
+                res.send(updateForm)
+
     } catch(error) {
         res.status(404).json({error:'El articulo no ha sido encontrado'})
     }
@@ -79,11 +105,11 @@ const updateProduct = async (req, res) => {
 
 const deleteProduct = async (req, res) => {
     try{
-        const id = req.params._id;
+        const id = req.params.productId;
         const deletedProduct= await products.findByIdAndDelete(id);
         res.json({mensaje: 'El producto ha sido eliminado del inventario', deletedProduct})
     } catch(error) {
-        res.status(404).json({error:'El articulo no ha sido encontrado'})
+        res.status(404).json({error:'No ha sido posible eliminar el artículo nº: '})
     }
 };
 
